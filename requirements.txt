@@ -3,6 +3,6 @@ cryptography
 flask
 googleapis-common-protos
 numpy>=1.11
-Pillow>=3.3
+Pillow>=3.3,<=9.2.0
 requests
 protobuf==3.20.*
