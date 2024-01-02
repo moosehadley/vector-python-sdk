@@ -130,15 +130,48 @@ class AnimationComponent(util.Component):
             await self._load_animation_trigger_list()
 
     async def _load_animation_list(self):
-        req = protocol.ListAnimationsRequest()
-        result = await self.grpc_interface.ListAnimations(req)
+        """
+        --- Moose's Note ---
+        The animation list request times out A LOT.
+        So I've tweaked it to retry a bunch of times before it just gives up.
+        ---end---
+        """
+        
+        
+        result = False
+        anim_request_retries = 10
+        while not result and anim_request_retries > 0:
+            try:
+                req = protocol.ListAnimationsRequest()
+                result = await self.grpc_interface.ListAnimations(req)
+            except:
+                print("Loading of animation list failed. This happens a lot. Trying ", str(anim_request_retries), " more times. Send a PR if you find a better solution.")
+                anim_request_retries = anim_request_retries - 1
+                
+                
         self.logger.debug(f"Animation List status={text_format.MessageToString(result.status, as_one_line=True)}, number of animations={len(result.animation_names)}")
         self._anim_dict = {a.name: a for a in result.animation_names}
         return result
 
     async def _load_animation_trigger_list(self):
-        req = protocol.ListAnimationTriggersRequest()
-        result = await self.grpc_interface.ListAnimationTriggers(req)
+        """
+        --- Moose's Note ---
+        The animation list request times out A LOT.
+        So I've tweaked it to retry a bunch of times before it just gives up.
+        ---end---
+        """
+        
+        
+        result = False
+        anim_request_retries = 10
+        while not result and anim_request_retries > 0:
+            try:
+                req = protocol.ListAnimationTriggersRequest()
+                result = await self.grpc_interface.ListAnimationTriggers(req)
+            except:
+                print("Loading of animation list failed. This happens a lot. Trying ", str(anim_request_retries), " more times. Send a PR if you find a better solution.")
+                anim_request_retries = anim_request_retries - 1
+            
         self.logger.debug(f"Animation Triggers List status={text_format.MessageToString(result.status, as_one_line=True)}, number of animation_triggers={len(result.animation_trigger_names)}")
         self._anim_trigger_dict = {a.name: a for a in result.animation_trigger_names}
         return result
